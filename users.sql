@@ -45,10 +45,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `profile`, `role`, `status`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'Ratikant Pradhan', 'bikipp6@gmail.com', '$2y$10$vYKI8jZ6od2YNCR4K0pDyeBtQv2VnPU.PY2Gi/GZinyeOeecnWQRa', 'uploads/mi polo.jpg', 'admin', 0, NULL, NULL, NULL),
-(3, 'Biki Pradhan', 'pradhancomputersciencerati2005@gmail.com', '$2y$10$5GMxYD6/Wrpt3KeZ.tra8OmLV6qc0T6IouoC.ilq6mmaCcSdINgtO', 'uploads/mouse.jpg', 'user', 0, '2025-07-02 12:21:05', NULL, NULL),
-(4, 'Anup', 'anup@gmail.com', '$2y$10$a7B1o1BJb70.w.PH36rkAujQFTprr9KJ2A289kUzByrhBiGNDkCiy', 'uploads/Keychron-K8-Pro-QMK-VIA-Wireless-Mechanical-Keyboard-for-Mac-Windows-OSA-profile-PBT-keycaps-PCB-screw-in-stabilizer-with-hot-swappable-Gateron-G-Pro-mechanical-red-switch-compatible_8603f64b-59fd-4.jpg', 'user', 1, '2025-07-03 12:51:52', NULL, NULL),
-(5, 'Admin', 'admin@gmail.com', '$2y$10$CCjaCDQsoX8Rwb33WYD2Qexo3m.21rt8Tg98LHouN2J5mVMeZ3gzq', 'uploads/php.png', 'admin', 0, '2025-07-03 13:25:20', NULL, NULL);
+(1, '', '', '$2y$10$vYKI8jZ6od2YNCR4K0pDyeBtQv2VnPU.PY2Gi/GZinyeOeecnWQRa', 'uploads/mi polo.jpg', 'admin', 0, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
