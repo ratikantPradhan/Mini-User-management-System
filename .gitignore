@@ -1,0 +1,7 @@
+# Ignore only these folders
+uploads/
+tcpdf/
+phpmailer/
+
+# Optionally ignore VS Code settings
+.vscode/
