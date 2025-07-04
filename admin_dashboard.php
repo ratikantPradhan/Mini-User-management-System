@@ -6,6 +6,10 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+if (!isset($_SESSION["role"]) || $_SESSION["role"] !== "admin") {
+    header("Location: login.php");
+    exit();
+}
 
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
@@ -108,8 +112,9 @@ $result = $conn->query($sql);
             <div class="bg-white shadow rounded-lg p-6">
                 <p class="text-gray-600">All users</p>
                 <p class="text-2xl font-bold text-blue-600"><?php $sql = "SELECT * FROM users";
-                                                            $result = $conn->query($sql);
-                                                            echo $result->num_rows; ?></p>
+                $result = $conn->query($sql);
+                echo $result->num_rows; ?>
+                </p>
             </div>
             <div class="bg-white shadow rounded-lg p-6">
                 <p class="text-gray-600">Active Today</p>
@@ -129,18 +134,32 @@ $result = $conn->query($sql);
                 </p>
 
             </div>
-            <!-- <div class="bg-white shadow rounded-lg p-6">
-                <p class="text-gray-600">Pending Requests</p>
-                <p class="text-2xl font-bold text-yellow-600">3</p>
-            </div> -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <p class="text-gray-600">Deleted Accounts</p>
+                <p class="text-2xl font-bold text-yellow-600">
+
+                    <?php
+                    $sql = "SELECT * FROM users WHERE status = 1";
+                    $result = $conn->query($sql);
+                    $users = $result->fetch_all(MYSQLI_ASSOC);
+                    $deletedCount = 0; // 
+                    foreach ($users as $user) {
+                        if ($user['status'] == 1) {
+                            $deletedCount++;
+                        }
+                    }
+                    echo $deletedCount;
+                    ?>
+                </p>
+            </div>
         </section>
 
         <!-- Charts -->
-
+                    
 
         <!-- Staff Table -->
         <section id="staff" class="bg-white shadow rounded-lg p-6">
-            <p class="text-gray-700 font-semibold mb-4">All Users</p>
+            <p class="text-gray-700 font-semibold mb-4">Active Users</p>
             <div class="overflow-x-auto">
                 <table class="min-w-full border divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50 text-gray-700">
@@ -148,6 +167,7 @@ $result = $conn->query($sql);
                             <th class="px-4 py-2 text-left">Sl no.</th>
                             <th class="px-4 py-2 text-left">Name</th>
                             <th class="px-4 py-2 text-left">Email</th>
+                            <th class="px-4 py-2 text-left">Role</th>
                             <th class="px-4 py-2 text-left">Profile</th>
                             <th class="px-4 py-2 text-center" colspan="2">Action</th>
                             <th class="px-4 py-2 text-left">Report</th>
@@ -156,7 +176,7 @@ $result = $conn->query($sql);
                     </thead>
                     <tbody class="divide-y divide-gray-100 text-gray-800 p-2 m-2">
                         <?php
-                        $sql = 'SELECT * FROM users WHERE status = 0';
+                        $sql = 'SELECT * FROM users WHERE status = 0 ORDER BY role="admin" DESC';
                         $result = $conn->query($sql);
 
                         while ($user = $result->fetch_assoc()) { ?>
@@ -164,6 +184,7 @@ $result = $conn->query($sql);
                                 <td class="px-4 py-2 text-left"><?php echo $user['id']; ?></td>
                                 <td class="px-4 py-2 text-left"><?php echo $user['username']; ?></td>
                                 <td class="px-4 py-2 text-left"> <?php echo $user['email']; ?></td>
+                                <td class="px-4 py-2 text-left"> <?php echo $user['role']; ?></td>
                                 <td class="px-4 py-2 text-left"> <img src="<?php echo $user['profile']; ?>" alt="" class="flex-shrink-0 w-10 h-10 rounded-full display-flex float-left"></td>
                                 <td class="px-1 py-2 text-right">
                                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"><a href="edit_user.php?id=<?= $user['id'] ?>" class="text-white hover:text-white-600 hover:underline">Edit</button>
