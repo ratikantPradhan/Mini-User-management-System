@@ -20,7 +20,7 @@ if (isset($_POST['submit'])) {
     }
 
     // Check if password is valid
-    if (empty($password) || strlen($password)  < 8 ) {
+    if (empty($password) || strlen($password)  < 8) {
         $error[] = "Password must be at least 8 characters.";
     }
 
@@ -77,7 +77,7 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <form action="register.php" method="post" enctype="multipart/form-data">
+    <form action="register.php" method="post" enctype="multipart/form-data" id="registerForm" novalidate>
         <div class="bg-white p-8 rounded shadow-md w-96">
             <h2 class="text-2xl font-bold mb-6">Register</h2>
             <?php if (!empty($error)) { ?>
@@ -85,42 +85,116 @@ if (isset($_POST['submit'])) {
                     <ul>
                         <?php foreach ($error as $err) { ?>
                             <li><?php echo $err; ?></li>
-                            
-                        <?php //reload page
-                        header("Location: register.php");
-                    } ?>
+
+                        <?php
+
+                        } ?>
                     </ul>
                 </div>
-                
+
             <?php } ?>
             <?php if (isset($success)) { ?>
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                    <?php echo $success; 
-                    header("Location: login.php");?>
+                    <?php echo $success;
+                    header("Location: success.php");
+                    exit;
+                    ?>
+
                 </div>
             <?php } ?>
             <div class="mb-4">
                 <label class="block text-gray-700">Username</label>
-                <input type="text" name="username" class="w-full border rounded px-3 py-2" required>
+                <input type="text" name="username" class="w-full border rounded px-3 py-2" title="3-16 alphanumeric characters and only underscore allowed" required>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700">Email</label>
-                <input type="email" name="email" class="w-full border rounded px-3 py-2" required>
+                <input type="email" name="email" class="w-full border rounded px-3 py-2" title="Enter a valid email address(email@domain.com)" required>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700">Password</label>
-                <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
+                <input type="password" name="password" class="w-full border rounded px-3 py-2" title="8–16 characters with atleast a uppercase, lowercase, number, and special character" required>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700">Profile Picture</label>
-                <input type="file" name="fileToUpload" class="w-full border rounded px-3 py-2" required>
+                <input type="file" name="fileToUpload" class="w-full border rounded px-3 py-2" title="Only JPG, JPEG and  PNG files are allowed and should be less than 1000KB" required>
             </div>
             <button type="submit" name="submit" class="w-full bg-blue-500 text-white py-2 rounded">Register</button>
             <p class="mt-4 text-center text-sm">Already have an account? <a href="login.php" class="text-blue-500">Login</a></p>
         </div>
     </form>
+    <script>
+        const form = document.getElementById("registerForm");
+
+        const fields = {
+            username: {
+                input: form.querySelector("[name='username']"),
+                validate: value => /^[a-zA-Z0-9_]{3,16}$/.test(value.trim()),
+                message: "Username must be 3–16 letters, no special characters except underscore."
+            },
+            email: {
+                input: form.querySelector("[name='email']"),
+                validate: value => /^\S+@\S+\.\S+$/.test(value),
+                message: "Enter a valid email address."
+            },
+            password: {
+                input: form.querySelector("[name='password']"),
+                validate: value => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,16}$/.test(value),
+                message: "Password must be 8–16 chars with uppercase, lowercase, number, and special character."
+            },
+            fileToUpload: {
+                input: form.querySelector("[name='fileToUpload']"),
+                validate: file => {
+                    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                    return file &&
+                        allowedTypes.includes(file.type) &&
+                        file.size <= 1 * 1024 * 1024; // <= 1MB
+                },
+                message: "Upload only .png/.jpg/.jpeg files under 1MB."
+            }
+        };
+
+        // Attach error display and validation to each input
+        Object.values(fields).forEach(({
+            input,
+            validate,
+            message
+        }) => {
+            const errorElement = document.createElement("div");
+            errorElement.className = "text-red-500 text-sm mt-1";
+            input.insertAdjacentElement("afterend", errorElement);
+
+            input.addEventListener("input", () => {
+                const value = input.type === "file" ? input.files[0] : input.value;
+                if (!validate(value)) {
+                    errorElement.textContent = message;
+                    input.classList.add("border-red-500");
+                    input.classList.remove("border-green-500");
+                } else {
+                    errorElement.textContent = "";
+                    input.classList.remove("border-red-500");
+                    input.classList.add("border-green-500");
+                }
+            });
+        });
+
+        // Prevent form submission on invalid input
+        form.addEventListener("submit", (e) => {
+            let isValid = true;
+            Object.values(fields).forEach(({
+                input,
+                validate
+            }) => {
+                const value = input.type === "file" ? input.files[0] : input.value;
+                if (!validate(value)) {
+                    input.dispatchEvent(new Event("input"));
+                    isValid = false;
+                }
+            });
+            if (!isValid) e.preventDefault();
+        });
+    </script>
+
+
 </body>
-<script>
-    
-</script>
+
 </html>
