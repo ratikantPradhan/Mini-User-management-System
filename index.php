@@ -65,11 +65,16 @@ if (isset($_POST['submit'])) {
 <head>
     <title>Login page</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="logo/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="logo/favicon.svg" />
+    <link rel="shortcut icon" href="logo/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="logo/apple-touch-icon.png" />
+    <link rel="manifest" href="logo/site.webmanifest" />
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">
-    <form action="login.php" method="post" enctype="multipart/form-data">
-        <div class="bg-white p-8 rounded shadow-md w-96">
+    <form action="login.php" method="post" enctype="multipart/form-data" id="loginForm" novalidate>
+        <div class=" bg-white p-8 rounded shadow-md w-96">
             <h2 class="text-2xl font-bold mb-6">Login</h2>
             <?php if (!empty($error)) { ?>
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
@@ -87,22 +92,87 @@ if (isset($_POST['submit'])) {
             <?php } ?>
             <div class="mb-4">
                 <label class="block text-gray-700">Email</label>
-                <input type="email" name="email" class="w-full border rounded px-3 py-2" required>
+                <input type="email" name="email" class="w-full border rounded px-3 py-2" title="Enter a valid email address(email@domain.com)" required>
             </div>
             <div class="mb-4">
                 <label class="block text-gray-700">Password</label>
-                <input type="password" name="password" class="w-full border rounded px-3 py-2" required>
+                <input type="password" name="password" class="w-full border rounded px-3 py-2" title="8–16 characters with atleast a uppercase, lowercase, number, and special character" required>
             </div>
             <!-- forget password -->
-            <div class="mb-4">
-                <!-- <input type="checkbox" name="remember" id="remember" class="display-flex items-left" > -->
-                <a href="forget_password.php" class="text-blue-500 text-sm hover:underline display-flex items-left">Forget password</a>
 
+
+            <div class="mb-4 flex items-center justify-between">
+                <label class="inline-flex items-center text-sm text-gray-700">
+                    <input type="checkbox" name="remember" id="remember" class="form-checkbox text-blue-500">
+                    <span class="ml-2">Remember me</span>
+                </label>
+
+                <a href="forget_password.php" class="text-blue-500 text-sm hover:underline">
+                    Forgot password?
+                </a>
             </div>
+
             <button type="submit" name="submit" class="w-full bg-blue-500 text-white py-2 rounded">Login</button>
             <p class="mt-4 text-center text-sm">Don't have an account? <a href="register.php" class="text-blue-500">Register</a></p>
         </div>
     </form>
+    <script>
+        const form = document.getElementById("loginForm");
+
+        const fields = {
+            email: {
+                input: form.querySelector("[name='email']"),
+                validate: value => /^\S+@\S+\.\S+$/.test(value),
+                message: "Enter a valid email address.( email@domain.com)"
+
+            },
+            password: {
+                input: form.querySelector("[name='password']"),
+                validate: value => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,16}$/.test(value),
+                message: "Password must be 8–16 chars with uppercase, lowercase, number, and special character."
+            }
+        };
+
+        // Attach error display and validation to each input
+        Object.values(fields).forEach(({
+            input,
+            validate,
+            message
+        }) => {
+            const errorElement = document.createElement("div");
+            errorElement.className = "text-red-500 text-sm mt-1";
+            input.insertAdjacentElement("afterend", errorElement);
+
+            input.addEventListener("input", () => {
+                const value = input.type === "file" ? input.files[0] : input.value;
+                if (!validate(value)) {
+                    errorElement.textContent = message;
+                    input.classList.add("border-red-500");
+                    input.classList.remove("border-green-500");
+                } else {
+                    errorElement.textContent = "";
+                    input.classList.remove("border-red-500");
+                    input.classList.add("border-green-500");
+                }
+            });
+        });
+
+        // Prevent form submission on invalid input
+        form.addEventListener("submit", (e) => {
+            let isValid = true;
+            Object.values(fields).forEach(({
+                input,
+                validate
+            }) => {
+                const value = input.type === "file" ? input.files[0] : input.value;
+                if (!validate(value)) {
+                    input.dispatchEvent(new Event("input"));
+                    isValid = false;
+                }
+            });
+            if (!isValid) e.preventDefault();
+        });
+    </script>
 </body>
 
 </html>
